@@ -1,20 +1,12 @@
-\# Backend Basics
-
+# Backend Basics
 Учебный проект для знакомства со структурой Python-проекта.
 
 
-
-\## Требования
-
+## Требования
 Python 3.12
 
+## Запуск 
 
-
-\## Запуск 
-
-&#x20;
-
-bash 
-
-```python main.py ```
-
+```bash
+python main.py
+ ```
