@@ -1,4 +1,5 @@
 from .http import HttpClient
+from exceptions import BadApiArgument
 
 CITY_COORDINATES = {
     "Moscow": (55.7558, 37.6173),
@@ -17,7 +18,7 @@ class WeatherClient(HttpClient):
         try:
             latitude, longitude = CITY_COORDINATES[city]
         except KeyError:
-            raise ValueError(f"City '{city}' is not supported.")
+            raise BadApiArgument(f"City '{city}' is not supported.")
         
         return f"{self.base_url}?latitude={latitude}&longitude={longitude}&current_weather=true"
 

@@ -2,6 +2,7 @@ import argparse
 import sys
 
 from processing import service
+from exceptions import BadApiArgument, ApiRequestError
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,9 +23,24 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    args = parse_args()
-    print(service.build_city_summary(args.city, args.currency))
-    return 0
+    try:
+        args = parse_args()
+    except Exception as e:
+        print(f"Error parsing arguments: {e}")
+        return 2
+    
+    try:
+        print(service.build_city_summary(args.city, args.currency))
+        return 0
+    except BadApiArgument as e:
+        print(f"Currency or city not found: {e}")
+        return 3
+    except ApiRequestError as e:
+        print(f"Error making API request: {e}")
+        return 4
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return 1
 
 
 if __name__ == "__main__":
