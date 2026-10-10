@@ -1,12 +1,14 @@
 import argparse
 import sys
 
+from exceptions import ApiRequestError, BadApiArgument
 from processing import service
-from exceptions import BadApiArgument, ApiRequestError
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="A simple command-line tool for getting city summary.")
+    p = argparse.ArgumentParser(
+        description="A simple command-line tool for getting city summary."
+    )
     p.add_argument(
         "--city",
         action="store",
@@ -28,7 +30,7 @@ def main() -> int:
     except Exception as e:
         print(f"Error parsing arguments: {e}")
         return 2
-    
+
     try:
         print(service.build_city_summary(args.city, args.currency))
         return 0

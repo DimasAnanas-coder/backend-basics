@@ -1,5 +1,7 @@
-from clients import weather, rates
-from .preprocessing import get_preprocessed_weather, get_preprocessed_rates
+from clients import rates, weather
+
+from .preprocessing import get_preprocessed_rates, get_preprocessed_weather
+
 
 def build_city_summary(city: str, currency: str = "USD") -> dict:
     row_weather = weather.get_weather(city)
