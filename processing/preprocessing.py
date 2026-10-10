@@ -4,7 +4,6 @@ def get_preprocessed_weather(row_weather: dict) -> dict:
 
     return {
         "temp_c": temp_c,
-        "description": row_weather.get("description"),
         "warm_clothes": is_need_warm_clothes
     }
 
