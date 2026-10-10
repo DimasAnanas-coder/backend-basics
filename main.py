@@ -1,6 +1,8 @@
 import argparse
 import sys
 
+from processing import service
+
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="A simple command-line tool for getting city summary.")
@@ -21,7 +23,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    print(args)
+    print(service.build_city_summary(args.city, args.currency))
     return 0
 
 
