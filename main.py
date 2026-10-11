@@ -4,6 +4,7 @@ import json
 
 from exceptions import ApiRequestError, BadApiArgument
 from processing import service
+from utils import print_summary
 
 
 def parse_args() -> argparse.Namespace:
@@ -56,7 +57,7 @@ def main() -> int:
         with open(args.json, "w") as f:
             json.dump(city_summary, f, indent=4)
     else:
-        print(city_summary)
+        print_summary(city_summary)
 
 
 if __name__ == "__main__":
