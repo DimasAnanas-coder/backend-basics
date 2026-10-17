@@ -1,5 +1,5 @@
 openapi: 3.1.0
-info: 
+info:
   title: Library api
   version: 1.0.0
 servers:
@@ -8,7 +8,7 @@ paths:
   /books:
     get:
       operationId: listBooks
-      responses: 
+      responses:
         "200":
           description: "Успешный возврат списка книг. Может быть пустой список"
           content:
@@ -16,12 +16,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookList'
         "400":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Некорретные параметры запроса"
+          $ref: "#/components/responses/BadRequestError"
         "5XX":
-          $ref: '#/components/responses/ErrorResponse'
-          description: "Внутренняя ошибка сервера"
-    
+          $ref: '#/components/responses/InternalServerError'
+
     post:
       operationId: createBook
       responses:
@@ -32,14 +30,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Book'
         "400":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Некорретные параметры запроса"
+          $ref: "#/components/responses/BadRequestError"
         "422":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Параметры запроса не проходят валидацию"
+          $ref: "#/components/responses/ValidationError"
         "5XX":
-          $ref: '#/components/responses/ErrorResponse'
-          description: "Внутренняя ошибка сервера"
+          $ref: '#/components/responses/InternalServerError'
   /books/{id}:
     parameters:
       - name: id
@@ -56,14 +51,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Book'
         "400":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Некорретные параметры запроса"
+          $ref: "#/components/responses/BadRequestError"
         "404":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Запрашиваемый ресурс не найден"
+          $ref: "#/components/responses/NotFoundError"
         "5XX":
-          $ref: '#/components/responses/ErrorResponse'
-          description: "Внутренняя ошибка сервера"
+          $ref: '#/components/responses/InternalServerError'
     put:
       operationId: replaceBook
       requestBody:
@@ -80,17 +72,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Book'
         "400":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Некорректные параметры запроса"
+          $ref: "#/components/responses/BadRequestError"
         "404":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Запрашиваемый ресурс не найден"
+          $ref: "#/components/responses/NotFoundError"
         "422":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Параметры запроса не проходят валидацию"
+          $ref: "#/components/responses/ValidationError"
         "5XX":
-          $ref: '#/components/responses/ErrorResponse'
-          description: "Внутренняя ошибка сервера"
+          $ref: '#/components/responses/InternalServerError'
     patch:
       operationId: updateBook
       requestBody:
@@ -107,47 +95,296 @@ paths:
               schema:
                 $ref: '#/components/schemas/Book'
         "400":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Некорректные параметры запроса"
+          $ref: "#/components/responses/BadRequestError"
         "404":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Запрашиваемый ресурс не найден"
+          $ref: "#/components/responses/NotFoundError"
         "422":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Параметры запроса не проходят валидацию"
+          $ref: "#/components/responses/ValidationError"
         "5XX":
-          $ref: '#/components/responses/ErrorResponse'
-          description: "Внутренняя ошибка сервера"
+          $ref: '#/components/responses/InternalServerError'
     delete:
       operationId: deleteBook
       responses:
         "204":
           description: "Книга удалена"
         "400":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Некорректные параметры запроса"
+          $ref: "#/components/responses/BadRequestError"
         "404":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Запрашиваемый ресурс не найден"
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/BusinessRuleViolationError"
         "5XX":
-          $ref: "#/components/responses/ErrorResponse"
-          description: "Внутренняя ошибка сервера"
-      
+          $ref: '#/components/responses/InternalServerError'
+
+  /readers:
+    get:
+      operationId: listReaders
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - name: sort
+          in: query
+          description: "Поле сортировки, префикс '-' — по убыванию"
+          schema: { type: string }
+        - name: email
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: "Список читателей"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReaderList'
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      operationId: createReader
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReaderCreate'
+      responses:
+        "201":
+          description: "Читатель создан"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reader'
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+
+  /readers/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer, minimum: 0 }
+    get:
+      operationId: getReader
+      responses:
+        "200":
+          description: "Читатель найден"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reader'
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      operationId: replaceReader
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReaderCreate'
+      responses:
+        "200":
+          description: "Читатель заменён"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reader'
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      operationId: updateReader
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReaderPatch'
+      responses:
+        "200":
+          description: "Читатель обновлён"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reader'
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      operationId: deleteReader
+      responses:
+        "204":
+          description: "Читатель удалён"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/BusinessRuleViolationError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+
+  /loans:
+    get:
+      operationId: listLoans
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - name: sort
+          in: query
+          description: "Поле сортировки, префикс '-' — по убыванию"
+          schema: { type: string }
+        - name: status
+          in: query
+          description: "overdue — due_date < now и returned_at == null"
+          schema:
+            type: string
+            enum: [active, overdue, returned]
+        - name: reader_id
+          in: query
+          schema: { type: integer, minimum: 0 }
+        - name: book_id
+          in: query
+          schema: { type: integer, minimum: 0 }
+      responses:
+        "200":
+          description: "Список выдач"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanList'
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      operationId: createLoan
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: "Уникальный ключ идемпотентности. Хранится 24 часа."
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 255
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanCreate'
+      responses:
+        "201":
+          description: "Выдача создана"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/IdempotencyMismatchError"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "5XX":
+          $ref: '#/components/responses/BusinessRuleViolationError'
+
+  /loans/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer, minimum: 0 }
+    get:
+      operationId: getLoan
+      responses:
+        "200":
+          description: "Выдача найдена"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
+
+  /loans/{id}/return:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer, minimum: 0 }
+    post:
+      operationId: returnLoan
+      description: "Возврат книги. Не DELETE (правило 3)."
+      responses:
+        "200":
+          description: "Книга возвращена"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/BusinessRuleViolationError"
+        "5XX":
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   schemas:
-
     Error:
       type: object
-      required: []
-      properties: 
-        status_code: {type: integer}
+      required: [status_code, code, message]
+      properties:
+        status_code: { type: integer }
         code:
           type: string
           description: "Машинночитаемая ошибка"
+          enum:
+            - INVALID_REQUEST
+            - NOT_FOUND
+            - VALIDATION_ERROR
+            - CONFLICT
+            - BUSINESS_RULE_VIOLATION
+            - IDEMPOTENCY_MISMATCH
         message:
           type: string
           description: "Подробное описание ошибки для клиента"
+
     Pagination:
       type: object
       required: [page, per_page, total_pages]
@@ -177,11 +414,11 @@ components:
         id: { type: integer, minimum: 0 }
         title: { type: string, minLength: 1 }
         author: { type: string, minLength: 1 }
-        isbn: 
-          type: string 
-          minLength: 10 
+        isbn:
+          type: string
+          minLength: 10
           maxLength: 13
-          examples: 
+          examples:
             - "0-13-235088-2"
             - "978-0132350884"
         published_year: { type: integer, minimum: 0, maximum: 2100 }
@@ -218,23 +455,46 @@ components:
     Reader:
       type: object
       required: [id, email]
-      properties: 
+      properties:
         id: { type: integer, minimum: 0 }
         full_name: { type: string, minLength: 1 }
         email: { type: string, minLength: 1 }
-        registered_at: 
+        registered_at:
           type: integer
           description: "Время регистрации в UNIX формате"
           minimum: 0
 
+    ReaderCreate:
+      type: object
+      required: [email]
+      properties:
+        full_name: { type: string, minLength: 1 }
+        email: { type: string, minLength: 1 }
+
+    ReaderPatch:
+      type: object
+      properties:
+        full_name: { type: string, minLength: 1 }
+        email: { type: string, minLength: 1 }
+
+    ReaderList:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Reader' }
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
     Loan:
       type: object
       required: [id, book_id, reader_id, loaned_at, due_date, returned_at]
-      properties: 
+      properties:
         id: { type: integer, minimum: 0 }
         book_id: { type: integer, minimum: 0 }
         reader_id: { type: integer, minimum: 0 }
-        loaned_at: 
+        loaned_at:
           type: integer
           description: "Время взятия книги в UNIX формате"
           minimum: 0
@@ -246,6 +506,28 @@ components:
           type: [integer, "null"]
           description: "Время возврата книги в UNIX формате"
           minimum: 0
+
+    LoanCreate:
+      type: object
+      required: [book_id, reader_id, due_date]
+      properties:
+        book_id: { type: integer, minimum: 0 }
+        reader_id: { type: integer, minimum: 0 }
+        due_date:
+          type: integer
+          minimum: 0
+          description: "Срок возврата в UNIX-формате, должен быть позже текущей даты"
+
+    LoanList:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Loan' }
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
   responses:
     ErrorResponse:
       description: "Ошибка"
@@ -253,3 +535,80 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+
+    BadRequestError:
+      description: "INVALID_REQUEST — некорректные параметры запроса"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 400
+            code: INVALID_REQUEST
+            message: "Параметр 'page' должен быть больше 0"
+
+    NotFoundError:
+      description: "NOT_FOUND — запрашиваемый ресурс не найден"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 404
+            code: NOT_FOUND
+            message: "Ресурс с указанным id не найден"
+
+    ValidationError:
+      description: "VALIDATION_ERROR — данные не прошли валидацию"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 422
+            code: VALIDATION_ERROR
+            message: "Поле 'email' обязательно"
+
+    ConflictError:
+      description: "CONFLICT — конфликт с текущим состоянием ресурса"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 409
+            code: CONFLICT
+            message: "Читатель с таким email уже существует"
+
+    BusinessRuleViolationError:
+      description: "BUSINESS_RULE_VIOLATION — нарушено бизнес-правило"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 409
+            code: BUSINESS_RULE_VIOLATION
+            message: "Нельзя удалить читателя с активными выдачами"
+
+    IdempotencyMismatchError:
+      description: "IDEMPOTENCY_MISMATCH — Idempotency-Key уже использован с другим телом"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 409
+            code: IDEMPOTENCY_MISMATCH
+            message: "Idempotency-Key уже использован с другим телом запроса"
+
+    InternalServerError:
+      description: "Внутренняя ошибка сервера"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 500
+            code: INVALID_REQUEST
+            message: "Внутренняя ошибка сервера"
