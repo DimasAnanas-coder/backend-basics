@@ -4,9 +4,18 @@ info:
   version: 1.0.0
 servers:
   - url: https://my-best-library.com/api/v1
+tags:
+  - name: Books
+    description: Управление книгами
+  - name: Readers
+    description: Управление читателями
+  - name: Loans
+    description: Выдача и возврат книг
+
 paths:
   /books:
     get:
+      tags: [Books]
       operationId: listBooks
       responses:
         "200":
@@ -21,7 +30,14 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     post:
+      tags: [Books]
       operationId: createBook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookPatch'
       responses:
         "201":
           description: "Успешное создание книги"
@@ -35,6 +51,7 @@ paths:
           $ref: "#/components/responses/ValidationError"
         "5XX":
           $ref: '#/components/responses/InternalServerError'
+          
   /books/{id}:
     parameters:
       - name: id
@@ -42,6 +59,7 @@ paths:
         required: true
         schema: {type: integer, minimum: 0}
     get:
+      tags: [Books]
       operationId: getBook
       responses:
         "200":
@@ -57,6 +75,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     put:
+      tags: [Books]
       operationId: replaceBook
       requestBody:
         required: true
@@ -80,6 +99,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     patch:
+      tags: [Books]
       operationId: updateBook
       requestBody:
         required: true
@@ -103,6 +123,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     delete:
+      tags: [Books]
       operationId: deleteBook
       responses:
         "204":
@@ -118,6 +139,7 @@ paths:
 
   /readers:
     get:
+      tags: [Readers]
       operationId: listReaders
       parameters:
         - name: page
@@ -145,6 +167,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     post:
+      tags: [Readers]
       operationId: createReader
       requestBody:
         required: true
@@ -175,6 +198,7 @@ paths:
         required: true
         schema: { type: integer, minimum: 0 }
     get:
+      tags: [Readers]
       operationId: getReader
       responses:
         "200":
@@ -188,6 +212,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     put:
+      tags: [Readers]
       operationId: replaceReader
       requestBody:
         required: true
@@ -213,6 +238,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     patch:
+      tags: [Readers]
       operationId: updateReader
       requestBody:
         required: true
@@ -238,6 +264,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     delete:
+      tags: [Readers]
       operationId: deleteReader
       responses:
         "204":
@@ -251,6 +278,7 @@ paths:
 
   /loans:
     get:
+      tags: [Loans]
       operationId: listLoans
       parameters:
         - name: page
@@ -287,6 +315,7 @@ paths:
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     post:
+      tags: [Loans]
       operationId: createLoan
       parameters:
         - name: Idempotency-Key
@@ -328,6 +357,7 @@ paths:
         required: true
         schema: { type: integer, minimum: 0 }
     get:
+      tags: [Loans]
       operationId: getLoan
       responses:
         "200":
@@ -348,6 +378,7 @@ paths:
         required: true
         schema: { type: integer, minimum: 0 }
     post:
+      tags: [Loans]
       operationId: returnLoan
       description: "Возврат книги. Не DELETE (правило 3)."
       responses:
