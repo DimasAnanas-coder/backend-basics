@@ -4,6 +4,8 @@ info:
   version: 1.0.0
 servers:
   - url: https://my-best-library.com/api/v1
+security:
+  - BearerAuth: []
 tags:
   - name: Books
     description: Управление книгами
@@ -17,6 +19,7 @@ paths:
     get:
       tags: [Books]
       operationId: listBooks
+      security: []
       responses:
         "200":
           description: "Успешный возврат списка книг. Может быть пустой список"
@@ -47,6 +50,10 @@ paths:
                 $ref: '#/components/schemas/Book'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "422":
           $ref: "#/components/responses/ValidationError"
         "5XX":
@@ -60,6 +67,7 @@ paths:
         schema: {type: integer, minimum: 0}
     get:
       tags: [Books]
+      security: []
       operationId: getBook
       responses:
         "200":
@@ -92,6 +100,10 @@ paths:
                 $ref: '#/components/schemas/Book'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "422":
@@ -116,6 +128,10 @@ paths:
                 $ref: '#/components/schemas/Book'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "422":
@@ -130,6 +146,10 @@ paths:
           description: "Книга удалена"
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "409":
@@ -164,6 +184,10 @@ paths:
                 $ref: '#/components/schemas/ReaderList'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     post:
@@ -184,6 +208,10 @@ paths:
                 $ref: '#/components/schemas/Reader'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "409":
           $ref: "#/components/responses/ConflictError"
         "422":
@@ -209,6 +237,10 @@ paths:
                 $ref: '#/components/schemas/Reader'
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     put:
@@ -229,6 +261,10 @@ paths:
                 $ref: '#/components/schemas/Reader'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "409":
@@ -255,6 +291,10 @@ paths:
                 $ref: '#/components/schemas/Reader'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "409":
@@ -271,6 +311,10 @@ paths:
           description: "Читатель удалён"
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "409":
           $ref: "#/components/responses/BusinessRuleViolationError"
         "5XX":
@@ -312,6 +356,10 @@ paths:
                 $ref: '#/components/schemas/LoanList'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "5XX":
           $ref: '#/components/responses/InternalServerError'
     post:
@@ -341,6 +389,10 @@ paths:
                 $ref: '#/components/schemas/Loan'
         "400":
           $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "409":
@@ -368,6 +420,10 @@ paths:
                 $ref: '#/components/schemas/Loan'
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "5XX":
           $ref: '#/components/responses/InternalServerError'
 
@@ -388,6 +444,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Loan'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "409":
@@ -412,6 +472,8 @@ components:
             - CONFLICT
             - BUSINESS_RULE_VIOLATION
             - IDEMPOTENCY_MISMATCH
+            - UNAUTHORIZED
+            - FORBIDDEN
         message:
           type: string
           description: "Подробное описание ошибки для клиента"
@@ -643,3 +705,24 @@ components:
             status_code: 500
             code: INVALID_REQUEST
             message: "Внутренняя ошибка сервера"
+
+    UnauthorizedError:
+      description: "UNAUTHORIZED — отсутствует или невалиден JWT-токен"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 401
+            code: UNAUTHORIZED
+            message: "Отсутствует или невалиден заголовок Authorization"
+    ForbiddenError:
+      description: "FORBIDDEN — недостаточно прав для выполнения операции"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status_code: 403
+            code: FORBIDDEN
+            message: "У вас нет прав на выполнение этого действия"
